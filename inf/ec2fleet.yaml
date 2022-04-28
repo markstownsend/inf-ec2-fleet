@@ -1,0 +1,58 @@
+WSTemplateFormatVersion: '2010-09-09'
+Description: Template to Create OnDemand EC2 Fleet using LaunchTemplate
+
+Parameters:
+  ImageId:
+    Type: String
+    Description: 'Amazon Linux 2 AMI (HVM), SSD Volume Type in us-east-1a region'
+    Default: 'ami-0c2b8ca1dad447f8a'
+  SecurityGroupId:
+    Type: String
+    Description: security group, add your security group id here
+    Default: sg-xxxxxxxxxxx
+  SubnetId:
+    Type: String
+    Description: Subnet Id in which to launch the EC2 Fleet
+    Default: subnet-xxxxxxxxxx
+  InstanceType:
+    Type: String
+    Description: Instance Type you want to deploy
+    Default: t3.large
+  SSHKeyName:
+    Description: SSH Keypair to login to the instance
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: sshkeypair
+    
+
+Resources:
+
+  EC2FleetLaunchTemplate:
+    Type: 'AWS::EC2::LaunchTemplate'
+    Properties:
+      LaunchTemplateName: EC2Fleet-LaunchTemplate  
+      LaunchTemplateData:
+         ImageId: !Ref ImageId
+         InstanceType: !Ref InstanceType
+         KeyName: !Ref SSHKeyName
+         NetworkInterfaces:
+           - DeviceIndex: '0'
+             AssociatePublicIpAddress: true
+             DeleteOnTermination: true
+             SubnetId: !Ref SubnetId
+             Groups:
+               - !Ref SecurityGroupId           
+
+  LaunchEC2Fleet:
+    Type: AWS::EC2::EC2Fleet
+    Properties: 
+      LaunchTemplateConfigs: 
+        - {
+            "LaunchTemplateSpecification": 
+            {
+               "Version": "$Latest",
+               "LaunchTemplateId": !Ref EC2FleetLaunchTemplate
+            }
+          }    
+      TargetCapacitySpecification: {"DefaultTargetCapacityType": "on-demand", "OnDemandTargetCapacity": 2, "TotalTargetCapacity": 2 }
+      Type: "instant"
+    DependsOn: EC2FleetLaunchTemplate
