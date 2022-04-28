@@ -1,0 +1,23 @@
+{
+   "OnDemandOptions":{
+      "AllocationStrategy": "lowestPrice"
+   },
+   "LaunchTemplateConfigs":[
+      {
+        "LaunchTemplateSpecification":{
+           "LaunchTemplateId":"lt-024ad935a54c49c29",
+           "Version":"2"
+        },
+        "Overrides":[
+           {
+               "SubnetId":"subnet-0668eeecfb2b97969"
+           }
+        ]
+     }
+   ],
+   "TargetCapacitySpecification":{
+      "TotalTargetCapacity": 4,
+      "DefaultTargetCapacityType": "on-demand"
+   },
+   "Type":"request"
+}
