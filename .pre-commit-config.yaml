@@ -1,0 +1,48 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+# General
+exclude: '\.(drawio)$'
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        exclude: ^.*\.(hbs)$
+        args:
+          - --fix=lf
+      - id: check-case-conflict
+      - id: check-added-large-files
+      - id: check-json
+      - id: check-toml
+      - id: detect-private-key
+
+  # Secrets
+  - repo: https://github.com/awslabs/git-secrets
+    rev: 5e28df337746db4f070c84f7069d365bfd0d72a8
+    hooks:
+      - id: git-secrets
+        entry: "git-secrets --scan"
+        files: "."
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v0.13.0
+    hooks:
+      - id: detect-secrets
+        args: ['--base64-limit', '5.5', '--hex-limit', '4']
+        exclude: .*/tests/.*|package.lock
+
+  # CloudFormation
+  - repo: https://github.com/aws-cloudformation/cfn-python-lint
+    rev: v0.58.1
+    hooks:
+      - id: cfn-python-lint
+        files: inf/cfn/.*\.(json|yml|yaml)$
+
+  # JS
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: ""
+    hooks:
+      - id: prettier
+        files: \.(js|html)$

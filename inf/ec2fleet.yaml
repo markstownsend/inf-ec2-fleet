@@ -1,8 +1,8 @@
-WSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: '2010-09-09'
 Description: Template to Create OnDemand EC2 Fleet using LaunchTemplate
 
 Parameters:
-  ImageId:
+  AWSImageId:
     Type: String
     Description: 'Amazon Linux 2 AMI (HVM), SSD Volume Type in us-east-1a region'
     Default: 'ami-0c2b8ca1dad447f8a'
@@ -22,16 +22,16 @@ Parameters:
     Description: SSH Keypair to login to the instance
     Type: AWS::EC2::KeyPair::KeyName
     Default: sshkeypair
-    
+
 
 Resources:
 
   EC2FleetLaunchTemplate:
     Type: 'AWS::EC2::LaunchTemplate'
     Properties:
-      LaunchTemplateName: EC2Fleet-LaunchTemplate  
+      LaunchTemplateName: EC2Fleet-LaunchTemplate
       LaunchTemplateData:
-         ImageId: !Ref ImageId
+         ImageId: !Ref AWSImageId
          InstanceType: !Ref InstanceType
          KeyName: !Ref SSHKeyName
          NetworkInterfaces:
@@ -40,19 +40,18 @@ Resources:
              DeleteOnTermination: true
              SubnetId: !Ref SubnetId
              Groups:
-               - !Ref SecurityGroupId           
+               - !Ref SecurityGroupId
 
   LaunchEC2Fleet:
     Type: AWS::EC2::EC2Fleet
-    Properties: 
-      LaunchTemplateConfigs: 
+    Properties:
+      LaunchTemplateConfigs:
         - {
-            "LaunchTemplateSpecification": 
+            "LaunchTemplateSpecification":
             {
                "Version": "$Latest",
                "LaunchTemplateId": !Ref EC2FleetLaunchTemplate
             }
-          }    
+          }
       TargetCapacitySpecification: {"DefaultTargetCapacityType": "on-demand", "OnDemandTargetCapacity": 2, "TotalTargetCapacity": 2 }
       Type: "instant"
-    DependsOn: EC2FleetLaunchTemplate
